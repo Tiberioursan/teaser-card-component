@@ -7,14 +7,6 @@ const ingress = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
 const image = 'https://www.fjordtravel.no/wp-content/uploads/2013/08/Amazing-Geirangerfjord-by-Pixabay.jpg'
 const cardTypeOptions = ['basicCard', 'detailedCard', 'horizontalCard', 'verticalCard']
 
-function handleActionContent(data) {
-  console.log('Action content:', data)
-}
-
-function handleActionMedia(data) {
-  console.log('Action media:', data)
-}
-
 </script>
 
 <template>
@@ -30,8 +22,6 @@ function handleActionMedia(data) {
         :tags="['Finans', 'Topic']"
         badge="New"
         :cardType="cardType"
-        @action_content="handleActionContent"
-        @action_media="handleActionMedia"
     />
   </div>
 </template>

@@ -66,12 +66,13 @@ function handleMouseout() {
   cardIsHovered.value = false
 }
 
-function handleMediaClick() {
-  emit('action_media', { title: props.title, id: props.id })
-}
-
-function handleTitleClick() {
-  emit('action_content', { title: props.title, id: props.id })
+function handleCardClick(event) {
+  if (event.target.classList.contains('card-title')) {
+    emit('action_content', { title: props.title, id: props.id });
+  }
+  else if (event.target.tagName === 'IMG' || props.cardType === 'basicCard' || props.cardType === 'detailedCard') {
+    emit('action_media', { title: props.title, id: props.id });
+  }
 }
 </script>
 
@@ -80,20 +81,21 @@ function handleTitleClick() {
       :class="[cardType, 'card']"
       @mouseover="handleMouseover"
       @mouseout="handleMouseout"
+      @click="handleCardClick"
   >
     <section v-if="cardType === 'detailedCard'" class="card-badge">
       {{ badge }}
     </section>
     <section class="card-image">
       <div v-if="cardType === 'basicCard'" class="index-number">{{ id }}</div>
-      <img v-else :src="image" alt="card image" @click="handleMediaClick" />
+      <img v-else :src="image" alt="card image" />
     </section>
     <section class="card-content">
       <h3
           v-if="cardType === 'verticalCard' || cardType === 'horizontalCard'"
           class="card-pre-title"
       >{{ preTitle }}</h3>
-      <h2 class="card-title" @click="handleTitleClick">
+      <h2 class="card-title">
         {{ truncateText(title, 30) }}
       </h2>
       <p
