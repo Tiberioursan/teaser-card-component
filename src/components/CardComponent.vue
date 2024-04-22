@@ -14,9 +14,6 @@ const props = defineProps({
     type: String,
     required: true
   },
-  preTitle: {
-    type: String
-  },
   badge: {
     type: String
   },
@@ -37,7 +34,7 @@ const props = defineProps({
 const emit = defineEmits(['action_media', 'action_content'])
 
 let cardIsHovered = ref(false)
-let displayedIngress = ref(props.ingress)
+let displayedIngress = ref('')
 let timeoutId = null;
 
 let truncateText = computed(() => (text, maxCharacters) => {
@@ -54,7 +51,7 @@ watch(cardIsHovered, (newVal) => {
   } else {
     timeoutId = setTimeout(() => {
       displayedIngress.value = truncateText.value(props.ingress, 120)
-    }, 500)
+    }, 300)
   }
 }, { immediate: true })
 
@@ -91,24 +88,18 @@ function handleCardClick(event) {
       <img v-else :src="image" alt="card image" />
     </section>
     <section class="card-content">
-      <h3
-          v-if="cardType === 'verticalCard' || cardType === 'horizontalCard'"
-          class="card-pre-title"
-      >{{ preTitle }}</h3>
       <h2 class="card-title">
         {{ truncateText(title, 30) }}
       </h2>
       <p
-          v-if="cardType === 'horizontalCard' || cardType === 'verticalCard'"
-          class="card-ingress overlay"
-      >{{ ingress }}</p>
-      <p v-else-if="cardType === 'detailedCard'" class="card-ingress">
-        {{ displayedIngress }}
-      </p>
+          v-if="cardType !=='basicCard'"
+          class="card-ingress"
+          :title="cardType !== 'detailedCard' ? 'Scrollable content' : ''"
+      >{{ displayedIngress }}</p>
       <ul class="card-tags">
         <li v-for="(tag, index) in tags" :key="tag">
-          {{ tag.toUpperCase() }}
-          <span v-if="index < tags.length - 1">|</span>
+          <span class="tag-name">{{ tag.toUpperCase() }}</span>
+          <span v-if="index < tags.length - 1" class="tag-separator">|</span>
         </li>
       </ul>
     </section>
@@ -125,13 +116,19 @@ function handleCardClick(event) {
   cursor: pointer;
   &:hover {
     box-shadow: 0 0 11px $shadow-color;
+    .card-image img {
+      transform: scale(1.1);
+    }
   }
   .card-image {
     width: 100%;
+    overflow: hidden;
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
+      transition: all 0.3s ease-in-out;
     }
   }
   .card-content {
@@ -153,9 +150,16 @@ function handleCardClick(event) {
       padding: 0;
       li {
         display: inline-block;
-        margin-right: 0.2rem;
         font-size: $font-size-xxs;
         color: $gray-3;
+        .tag-separator {
+          margin: 0 0.2rem;
+        }
+        .tag-name {
+          &:hover {
+            text-decoration: underline; 
+          }
+        }
       }
     }
   }
@@ -176,7 +180,6 @@ function handleCardClick(event) {
     padding: 2px 10px 2px 5px;
     border-radius: 4px;
     width: fit-content;
-    z-index: 1;
     &::before {
       content: "•";
       font-size: $font-size-xl;
@@ -194,18 +197,13 @@ function handleCardClick(event) {
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: -1;
   }
   .card-content {
     justify-content: end;
     color: $white;
     height: auto;
     margin-top: auto;
-    z-index: 1;
-    &:hover {
-      .card-ingress {
-        max-height: 10em;
-      }
-    }
     .card-title {
       order: 2;
       font-size: $font-size-xl;
@@ -213,9 +211,7 @@ function handleCardClick(event) {
     }
     .card-ingress {
       order: 3;
-      max-height: 3em;
       overflow: hidden;
-      transition: max-height 0.5s ease-in-out;
     }
     .card-tags {
       order: 1;
@@ -256,7 +252,7 @@ function handleCardClick(event) {
       margin: auto 0;
       font-size: $font-size-sm;
       span {
-        margin: 0 0.5rem;
+        margin: 0 0.2rem;
       }
     }
   }
@@ -264,40 +260,21 @@ function handleCardClick(event) {
 
 // CSS for VERTICAL and HORIZONTAL card types
 .verticalCard, .horizontalCard {
-  &:hover {
-    .card-ingress.overlay {
-      opacity: 1;
-    }
-  }
-  .overlay {
-    position: absolute;
-    top: 80px;
-    left: 0;
-    width: 100%;
-    height: calc(100% - 80px);
-    background-color: $overlay-background-color;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    box-sizing: border-box;
-    padding: 1rem;
-    overflow: auto;
-    scrollbar-width: none;
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-}
-.verticalCard, .horizontalCard {
   .card-content {
     position: relative;
-    .card-pre-title {
+    .card-title {
       color: $gray-2;
       font-size: $font-size-xs;
       font-weight: $font-weight-medium;
     }
-    .card-title {
+    .card-ingress {
       font-size: $font-size-lg;
       font-weight: $font-weight-bold;
+      overflow: auto;
+      scrollbar-width: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
     .card-tags {
       margin-top: auto;
@@ -307,8 +284,8 @@ function handleCardClick(event) {
 .verticalCard {
   flex-direction: column;
   display: grid;
-  grid-template-rows: 60% 40%;
-  height: fit-content;
+  grid-template-rows: 50% 50%;
+  height: 500px;
   width: 50%;
   min-width: 400px;
   .card-image {
@@ -320,7 +297,7 @@ function handleCardClick(event) {
 }
 
 .horizontalCard {
-  min-height: 250px;
+  height: 300px;
   .card-image {
     flex: 1;
   }

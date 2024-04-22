@@ -18,7 +18,6 @@ const cardTypeOptions = ['basicCard', 'detailedCard', 'horizontalCard', 'vertica
         :title="title"
         :image="image"
         :ingress="ingress"
-        :pre-title="preTitle"
         :tags="['Finans', 'Topic']"
         badge="New"
         :cardType="cardType"

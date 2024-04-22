@@ -9,7 +9,6 @@ test('CardComponent - renders props correctly', () => {
             id: 1,
             title: 'Test Title',
             ingress: 'Test Ingress',
-            preTitle: 'Test PreTitle',
             badge: 'Test Badge',
             image: 'Test Image',
             tags: ['Test Tag1', 'Test Tag2'],
@@ -20,7 +19,6 @@ test('CardComponent - renders props correctly', () => {
     assert.strictEqual(wrapper.vm.id, 1)
     assert.strictEqual(wrapper.vm.title, 'Test Title')
     assert.strictEqual(wrapper.vm.ingress, 'Test Ingress')
-    assert.strictEqual(wrapper.vm.preTitle, 'Test PreTitle')
     assert.strictEqual(wrapper.vm.badge, 'Test Badge')
     assert.strictEqual(wrapper.vm.image, 'Test Image')
     assert.deepStrictEqual(wrapper.vm.tags, ['Test Tag1', 'Test Tag2'])
