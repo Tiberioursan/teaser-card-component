@@ -204,6 +204,11 @@ function handleCardClick(event) {
     color: $white;
     height: auto;
     margin-top: auto;
+    &:hover {
+      .card-ingress {
+        max-height: 10em;
+      }
+    }
     .card-title {
       order: 2;
       font-size: $font-size-xl;
@@ -211,7 +216,9 @@ function handleCardClick(event) {
     }
     .card-ingress {
       order: 3;
+      max-height: 3em;
       overflow: hidden;
+      transition: max-height 0.5s ease-in-out;
     }
     .card-tags {
       order: 1;
