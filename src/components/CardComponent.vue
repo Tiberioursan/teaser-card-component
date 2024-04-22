@@ -53,7 +53,9 @@ watch(cardIsHovered, (newVal) => {
     ingressTypingAnimation()
   } else {
     clearInterval(intervalId)
-    displayedIngress.value = truncateText.value(props.ingress, maxIngressCharacters)
+    setTimeout(() => {
+      displayedIngress.value = truncateText.value(props.ingress, maxIngressCharacters)
+    }, 500)
   }
 }, { immediate: true })
 
