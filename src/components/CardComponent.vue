@@ -33,9 +33,12 @@ const props = defineProps({
 
 const emit = defineEmits(['action_media', 'action_content'])
 
+const maxTitleCharacters = 30
+const maxIngressCharacters = 120
+let intervalId = null
+
 let cardIsHovered = ref(false)
-let displayedIngress = ref('')
-let timeoutId = null;
+let displayedIngress = ref(props.ingress)
 
 let truncateText = computed(() => (text, maxCharacters) => {
   if (text.length > maxCharacters) {
@@ -45,21 +48,32 @@ let truncateText = computed(() => (text, maxCharacters) => {
 })
 
 watch(cardIsHovered, (newVal) => {
-  clearTimeout(timeoutId)
   if (newVal) {
-    displayedIngress.value = props.ingress
+    displayedIngress.value = displayedIngress.value.slice(0, -4)
+    ingressTypingAnimation()
   } else {
-    timeoutId = setTimeout(() => {
-      displayedIngress.value = truncateText.value(props.ingress, 120)
-    }, 300)
+    clearInterval(intervalId)
+    displayedIngress.value = truncateText.value(props.ingress, maxIngressCharacters)
   }
 }, { immediate: true })
 
-function handleMouseover() {
+function ingressTypingAnimation () {
+  let index = displayedIngress.value.length;
+  intervalId = setInterval(() => {
+    if (index < props.ingress.length) {
+      displayedIngress.value += props.ingress[index];
+      index++;
+    } else {
+      clearInterval(intervalId);
+    }
+  }, 10)
+}
+
+function handleMouseenter() {
   cardIsHovered.value = true
 }
 
-function handleMouseout() {
+function handleMouseleave() {
   cardIsHovered.value = false
 }
 
@@ -76,8 +90,8 @@ function handleCardClick(event) {
 <template>
   <article
       :class="[cardType, 'card']"
-      @mouseover="handleMouseover"
-      @mouseout="handleMouseout"
+      @mouseenter="handleMouseenter"
+      @mouseleave="handleMouseleave"
       @click="handleCardClick"
   >
     <section v-if="cardType === 'detailedCard'" class="card-badge">
@@ -89,7 +103,7 @@ function handleCardClick(event) {
     </section>
     <section class="card-content">
       <h2 class="card-title">
-        {{ truncateText(title, 30) }}
+        {{ truncateText(title, maxTitleCharacters) }}
       </h2>
       <p
           v-if="cardType !=='basicCard'"

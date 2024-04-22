@@ -81,16 +81,18 @@ test('CardComponent - updates displayedIngress and cardIsHovered on mouse events
         }
     })
 
-    await wrapper.trigger('mouseover')
+    await wrapper.trigger('mouseenter')
     assert.strictEqual(wrapper.vm.cardIsHovered, true)
-    assert.strictEqual(wrapper.vm.displayedIngress, wrapper.vm.props.ingress)
+    setTimeout(() => {
+        assert.strictEqual(wrapper.vm.displayedIngress, wrapper.vm.props.ingress)
+    }, 500)
 
-    await wrapper.trigger('mouseout')
+    await wrapper.trigger('mouseleave')
     assert.strictEqual(wrapper.vm.cardIsHovered, false)
     assert.strictEqual(wrapper.vm.displayedIngress, wrapper.vm.truncateText(wrapper.vm.props.ingress, 120))
 })
 
-test('CardComponent - handleMouseover and handleMouseout work correctly', async () => {
+test('CardComponent - handleMouseenter and handleMouseleave work correctly', async () => {
     const wrapper = mount(CardComponent, {
         props: {
             id: 1,
@@ -100,10 +102,10 @@ test('CardComponent - handleMouseover and handleMouseout work correctly', async 
         }
     })
 
-    await wrapper.trigger('mouseover')
+    await wrapper.trigger('mouseenter')
     assert.strictEqual(wrapper.vm.cardIsHovered, true)
 
-    await wrapper.trigger('mouseout')
+    await wrapper.trigger('mouseleave')
     assert.strictEqual(wrapper.vm.cardIsHovered, false)
 })
 
@@ -121,4 +123,23 @@ test('CardComponent - renders correctly with long text', () => {
     const displayedTitle = wrapper.find('.card-title').text()
     assert.strictEqual(displayedTitle.length <= 30, true)
     assert.strictEqual(displayedTitle, wrapper.vm.truncateText(longText, 30))
+})
+
+test('CardComponent - function ingressTypingAnimation is working properly', async () => {
+    const veryLongText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+    const wrapper = mount(CardComponent, {
+        props: {
+            id: 1,
+            title: 'Test Title',
+            ingress: veryLongText,
+            cardType: 'horizontalCard',
+        }
+    })
+    
+    const initialDisplayedIngress = wrapper.vm.displayedIngress
+    await wrapper.trigger('mouseenter')
+    setTimeout(() => {
+        assert.strictEqual(wrapper.vm.displayedIngress > initialDisplayedIngress, true)
+    }, 100)  
+    
 })
